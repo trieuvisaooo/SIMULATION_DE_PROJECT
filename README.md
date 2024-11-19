@@ -3,6 +3,19 @@
 ## YÊU CẦU:
 1. Sử dụng kafka để đọc dữ liệu csv từng dòng và gửi thông tin này đến topic định nghĩa 
 trước theo chu kì thời gian ngẫu nhiên trong phạm vi từ 1s đến 3s
+- NOTE: 
+    - Repo: 
+        - Vì data lớn nên đã được ignore khi push lên
+    - Kafka:
+        - Credit Card Transaction Data được producer gửi đi dưới dạng json
+- TODO: 
+    - Tạo folder 'data' 
+    - Tải về các file csv và lưu vào folder 'data' 
+- TEST:
+    1. run zookeeper
+    2. run kafka
+    3. run main.py to produce msg
+    4. run consumer.py to check msg produced
 2. Sử dụng spark streaming để đọc dữ liệu từ kafka theo thời gian thực, nghĩa là bất cứ
 thông tin nào từ kafka được xử lý tức thì, các xử lý bao gồm lọc dữ liệu, biến đổi thông 
 tin, tính toán dữ liệu.
