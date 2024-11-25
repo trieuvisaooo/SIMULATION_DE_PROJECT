@@ -3,7 +3,7 @@ from kafka.settings import TOPIC_NAME
 
 def start_kafka():
     if create_topic(TOPIC_NAME):
-        print('Start produce messages...')
+        print('Producing messages...')
         produce_msg(TOPIC_NAME)
 
 if __name__ == '__main__':

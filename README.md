@@ -14,14 +14,27 @@ trước theo chu kì thời gian ngẫu nhiên trong phạm vi từ 1s đến 3
 - TEST:
     1. run zookeeper
     2. run kafka
-    3. run main.py to produce msg
+    3. run producer.py to produce msg
     4. run consumer.py to check msg produced
 2. Sử dụng spark streaming để đọc dữ liệu từ kafka theo thời gian thực, nghĩa là bất cứ
 thông tin nào từ kafka được xử lý tức thì, các xử lý bao gồm lọc dữ liệu, biến đổi thông 
 tin, tính toán dữ liệu.
+- NOTE:
+    - Version pyspark sử dụng là pyspark==3.5.3
+- TODO:
+    - Thực hiện đầy đủ các bước ở mục 1.kafka
+    - Sau khi TEST thành công thì tiến hành cấu hình lưu trữ dữ liệu transaction vào hadoop 
+    (lưu ý: cần lưu thêm dữ liệu về user và card ở 2 file sd254_cards.csv và sd254_users.csv)
+- TEST: 
+    1. run zookeeper
+    2. run kafka
+    3. run producer.py để dùng kafka đọc từng dòng từ file data
+    4. run streaming.py để dùng spark đọc dữ liệu từ kafka và in ra kết quả kiểm tra
+    (lưu ý: khi chạy streaming.py lần đầu sẽ mất khá nhiều thời gian để chương trình tự tải và cài đặt dependency spark-sql-kafka)
+
 3. Sử dụng Hadoop để lưu trữ các thông tin được xử lý từ Spark và là nơi lưu trữ thông tin 
 được xử lý để có thể trực quan hóa dữ liệu và thống kê ở giai đoạn sau.
 4. Sử dụng Power B I để đọc dữ liệu từ Hadoop (dạng csv), thống kê dữ liệu theo mô tả bài 
 toán và hiển thị dữ liệu một cách trực quan. 
-5. Sử dụng Air Flow để lên lịch quá trình đọc và hiển thị dữ liệu từ Power PI sao cho dữ liệu 
+5. Sử dụng Air Flow để lên lịch quá trình đọc và hiển thị dữ liệu từ Power BI sao cho dữ liệu 
 luôn được update mỗi ngày.
