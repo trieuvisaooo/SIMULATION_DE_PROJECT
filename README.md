@@ -8,6 +8,7 @@ trước theo chu kì thời gian ngẫu nhiên trong phạm vi từ 1s đến 3
         - Vì data lớn nên đã được ignore khi push lên
     - Kafka:
         - Credit Card Transaction Data được producer gửi đi dưới dạng json
+    - Nếu bị lỗi import module --> chạy: pip install -r requirements.txt để cài các module liên quan
 - TODO: 
     - Tạo folder 'data' 
     - Tải về các file csv và lưu vào folder 'data' 
