@@ -5,6 +5,7 @@ from pyspark.sql.types import StructType, StructField, StringType, IntegerType, 
 from helper import get_exchange_rate
 
 CHECK_POINT_DIR = 'C:/StreamingCheckpoint/'
+OUTPUT_PATH = "hdfs://localhost:9000/user/spark/transactions_csv"  # Đường dẫn lưu dữ liệu trên HDFS
 
 # Tạo SparkSession
 spark = SparkSession.builder \
@@ -75,10 +76,19 @@ formatted_transactions = valid_transactions \
     .withColumn("Time", date_format(unix_timestamp(col("Time"), 'HH:mm').cast("timestamp"), 'HH:mm:ss'))
 
 # In kết quả ra console ==> thay đổi để thay vì in ra console thì lưu vào hadoop
+# query = formatted_transactions.writeStream \
+#     .outputMode("append") \
+#     .format("console") \
+#     .option("checkpointLocation", CHECK_POINT_DIR) \
+#     .start()
+
+# Lưu dữ liệu vào HDFS dưới dạng CSV 
 query = formatted_transactions.writeStream \
     .outputMode("append") \
-    .format("console") \
+    .format("csv") \
+    .option("header", "true") \
     .option("checkpointLocation", CHECK_POINT_DIR) \
+    .option("path", OUTPUT_PATH) \
     .start()
 
 query.awaitTermination()
