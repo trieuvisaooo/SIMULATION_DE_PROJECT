@@ -35,7 +35,18 @@ tin, tính toán dữ liệu.
 
 3. Sử dụng Hadoop để lưu trữ các thông tin được xử lý từ Spark và là nơi lưu trữ thông tin 
 được xử lý để có thể trực quan hóa dữ liệu và thống kê ở giai đoạn sau.
-4. Sử dụng Power B I để đọc dữ liệu từ Hadoop (dạng csv), thống kê dữ liệu theo mô tả bài 
+- NOTE:
+    - Version hadoop sử dụng là Hadoop 3.2.4
+- TODO:
+    - Thực hiện đầy đủ các bước ở mục 1.kafka và mục 2.spark streaming
+- TEST: 
+    1. run zookeeper
+    2. run kafka
+    3. run hadoop
+    4. run producer.py 
+    5. run streaming.py
+    6. Mở "http://localhost:9870/explorer.html#/user/spark/transactions_csv" để kiểm tra có file csv được lưu trữ hay chưa.
+5. Sử dụng Power B I để đọc dữ liệu từ Hadoop (dạng csv), thống kê dữ liệu theo mô tả bài 
 toán và hiển thị dữ liệu một cách trực quan. 
-5. Sử dụng Air Flow để lên lịch quá trình đọc và hiển thị dữ liệu từ Power BI sao cho dữ liệu 
+6. Sử dụng Air Flow để lên lịch quá trình đọc và hiển thị dữ liệu từ Power BI sao cho dữ liệu 
 luôn được update mỗi ngày.
