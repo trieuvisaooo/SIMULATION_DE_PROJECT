@@ -82,25 +82,15 @@ formatted_transactions = valid_transactions \
 #     .option("checkpointLocation", CHECK_POINT_DIR) \
 #     .start()
 
-# Lưu dữ liệu vào HDFS dưới dạng CSV 
-query = formatted_transactions.writeStream \
+# Ghi từng batch ra HDFS dưới dạng CSV
+query = valid_transactions.writeStream \
     .outputMode("append") \
     .format("csv") \
     .option("header", "true") \
-    .option("checkpointLocation", CHECK_POINT_DIR) \
     .option("path", OUTPUT_PATH) \
+    .option("checkpointLocation", CHECK_POINT_DIR) \
+    .trigger(processingTime="1 minute") \
     .start()
 
+# Chờ quá trình streaming
 query.awaitTermination()
-
-# # Lưu dữ liệu vào Hadoop
-# output_path = "hdfs://localhost:9000/user/spark/transactions"
-
-# query = formatted_transactions.writeStream \
-#     .outputMode("append") \
-#     .format("parquet") \
-#     .option("checkpointLocation", CHECK_POINT_DIR) \
-#     .option("path", output_path) \
-#     .start()
-
-# query.awaitTermination()
