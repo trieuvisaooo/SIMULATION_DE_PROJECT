@@ -77,15 +77,8 @@ formatted_transactions = valid_transactions \
         to_date(concat(col("Day"), lit("/"), col("Month"), lit("/"), col("Year")), "dd/MM/yyyy"), "dd/MM/yyyy")) \
     .withColumn("Time", date_format(unix_timestamp(col("Time"), 'HH:mm').cast("timestamp"), 'HH:mm:ss'))
 
-# In kết quả ra console ==> thay đổi để thay vì in ra console thì lưu vào hadoop
-# query = formatted_transactions.writeStream \
-#     .outputMode("append") \
-#     .format("console") \
-#     .option("checkpointLocation", CHECK_POINT_DIR) \
-#     .start()
-
 # Ghi từng batch ra HDFS dưới dạng CSV
-query = valid_transactions.writeStream \
+query = formatted_transactions.writeStream \
     .outputMode("append") \
     .format("csv") \
     .option("header", "true") \
