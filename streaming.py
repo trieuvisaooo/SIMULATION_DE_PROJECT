@@ -4,7 +4,7 @@ from pyspark.sql.functions import from_json, col, to_date, unix_timestamp, date_
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType
 from helper import get_exchange_rate
 
-CHECK_POINT_DIR = 'C:/StreamingCheckpoint/'
+CHECK_POINT_DIR = 'hdfs://localhost:9000/user/spark/checkpoints'
 OUTPUT_PATH = "hdfs://localhost:9000/user/spark/transactions_csv"  # Đường dẫn lưu dữ liệu trên HDFS
 
 # Tạo SparkSession
@@ -23,7 +23,9 @@ df = spark.readStream \
     .option("kafka.bootstrap.servers", "localhost:9092") \
     .option("subscribe", TOPIC_NAME) \
     .option("startingOffsets", "earliest") \
+    .option("failOnDataLoss", "false") \
     .load()
+# Dương thêm dòng failOnDataLoss => Dùng để không bị terminated khi streaming dữ liệu
 
 # Chuyển value từ Kafka thành chuỗi
 messages = df.selectExpr("CAST(value AS STRING) as json_value") 
@@ -82,7 +84,7 @@ formatted_transactions = valid_transactions \
 #     .option("checkpointLocation", CHECK_POINT_DIR) \
 #     .start()
 
-# Lưu dữ liệu vào HDFS dưới dạng CSV 
+# # Lưu dữ liệu vào HDFS dưới dạng CSV 
 query = formatted_transactions.writeStream \
     .outputMode("append") \
     .format("csv") \
