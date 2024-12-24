@@ -17,7 +17,7 @@ GROUP_ID = "34bc619a-fc6f-41ea-9682-b19deac7ae9d"
 DATASET_ID = "e07ffdcc-34d7-47b2-bffc-d6f33f84cb0a"
 
 # HDFS Configuration
-HDFS_HOST = "localhost"
+HDFS_HOST = "LAPTOP-QHS1R0BJ.mshome.net"
 HDFS_PORT = "9870"
 HDFS_USER = "hadoop"
 HDFS_PATH = "/user/spark/transactions_csv/"
@@ -44,9 +44,9 @@ dag = DAG(
 
 # Task 1: Check for new files in HDFS
 def check_hdfs_files():
-    logging.info("Connecting to WebHDFS at localhost:9870")
+    logging.info(f"Connecting to WebHDFS at {HDFS_HOST}:{HDFS_PORT}")
     try:
-        hdfs = PyWebHdfsClient(host=HDFS_HOST, port=HDFS_PORT, user_name=HDFS_USER, timeout=120)
+        hdfs = PyWebHdfsClient(host=HDFS_HOST, port=HDFS_PORT, user_name=HDFS_USER, timeout=300)
         files = hdfs.list_dir(HDFS_PATH)["FileStatuses"]["FileStatus"]
         new_files = [file["pathSuffix"] for file in files if file["type"] == "FILE"]
         logging.info(f"Found files: {new_files}")
@@ -66,7 +66,7 @@ def sync_to_powerbi(**kwargs):
     new_files = kwargs['ti'].xcom_pull(task_ids="check_hdfs_files")
 
     if not new_files:
-        logging.info("No new files found in HDFS.")
+        logging.info("No new files found, skipping sync.")
         return
 
     # Get Access Token from Azure AD
@@ -97,7 +97,15 @@ def sync_to_powerbi(**kwargs):
             hdfs = PyWebHdfsClient(host=HDFS_HOST, port=HDFS_PORT, user_name=HDFS_USER, timeout=120)
             file_data = hdfs.read_file(file_path)
             csv_data = io.StringIO(file_data.decode("utf-8"))
-            df = pd.read_csv(csv_data)
+            
+            # Try to parse CSV
+            try:
+                df = pd.read_csv(csv_data)
+                df = df.fillna(0)  # Replace NaN with 0
+                df.replace([float("inf"), float("-inf")], 0, inplace=True)  # Replace infinity values
+            except pd.errors.ParserError as e:
+                logging.error(f"Error parsing CSV file {file_name}: {e}")
+                continue  # Skip this file and move to the next
 
             # Convert DataFrame to JSON and send to Power BI
             rows = df.to_dict(orient="records")
@@ -114,6 +122,7 @@ def sync_to_powerbi(**kwargs):
                 logging.error(f"Failed to sync file {file_name}: {response.status_code} - {response.text}")
         except Exception as e:
             logging.error(f"Error processing file {file_name}: {e}")
+
 
 sync_to_powerbi_task = PythonOperator(
     task_id="sync_to_powerbi",
