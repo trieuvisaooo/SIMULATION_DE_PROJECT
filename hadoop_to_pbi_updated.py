@@ -17,7 +17,7 @@ GROUP_ID = "34bc619a-fc6f-41ea-9682-b19deac7ae9d"
 DATASET_ID = "e07ffdcc-34d7-47b2-bffc-d6f33f84cb0a"
 
 # HDFS Configuration
-HDFS_HOST = "LAPTOP-QHS1R0BJ.mshome.net"
+HDFS_HOST = "DESKTOP-8LQNOE7.mshome.net"
 HDFS_PORT = "9870"
 HDFS_USER = "hadoop"
 HDFS_PATH = "/user/spark/transactions_csv/"
@@ -48,6 +48,12 @@ def check_hdfs_files():
     try:
         hdfs = PyWebHdfsClient(host=HDFS_HOST, port=HDFS_PORT, user_name=HDFS_USER, timeout=300)
         files = hdfs.list_dir(HDFS_PATH)["FileStatuses"]["FileStatus"]
+        logging.info(f"HDFS raw response: {files}")
+        
+        files = files.get("FileStatuses", {}).get("FileStatus", [])
+        if not files:
+            logging.warning("No files found in the specified HDFS directory.")
+            
         new_files = [file["pathSuffix"] for file in files if file["type"] == "FILE"]
         logging.info(f"Found files: {new_files}")
         return new_files
@@ -64,6 +70,7 @@ check_files_task = PythonOperator(
 # Task 2: Sync data to Power BI
 def sync_to_powerbi(**kwargs):
     new_files = kwargs['ti'].xcom_pull(task_ids="check_hdfs_files")
+    logging.info(f"Files received from HDFS check: {new_files}")
 
     if not new_files:
         logging.info("No new files found, skipping sync.")
@@ -109,7 +116,8 @@ def sync_to_powerbi(**kwargs):
 
             # Convert DataFrame to JSON and send to Power BI
             rows = df.to_dict(orient="records")
-            url = f"https://api.powerbi.com/v1.0/myorg/groups/{GROUP_ID}/datasets/{DATASET_ID}/addRows"
+            # url = f"https://api.powerbi.com/v1.0/myorg/groups/{GROUP_ID}/datasets/{DATASET_ID}/addRows"
+            url = f"https://api.powerbi.com/v1.0/myorg/groups/{GROUP_ID}/datasets/{DATASET_ID}/tables/Main/addRows"
             headers = {
                 "Authorization": f"Bearer {access_token}",
                 "Content-Type": "application/json",
