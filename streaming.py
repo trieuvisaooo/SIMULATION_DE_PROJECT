@@ -12,6 +12,7 @@ spark = SparkSession.builder \
     .appName("TransactionStreaming") \
     .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.3") \
     .master("local[2]") \
+    .config("spark.hadoop.dfs.blocksize", "16m") \
     .getOrCreate()
 
 # Lấy tỷ giá USD/VND
@@ -78,13 +79,16 @@ formatted_transactions = valid_transactions \
     .withColumn("Time", date_format(unix_timestamp(col("Time"), 'HH:mm').cast("timestamp"), 'HH:mm:ss'))
 
 # Ghi từng batch ra HDFS dưới dạng CSV
-query = formatted_transactions.writeStream \
+query = formatted_transactions \
+    .coalesce(1) \
+    .writeStream \
     .outputMode("append") \
     .format("csv") \
     .option("header", "true") \
     .option("path", OUTPUT_PATH) \
     .option("checkpointLocation", CHECK_POINT_DIR) \
-    .trigger(processingTime="1 minute") \
+    .option("dfs.blocksize", "16m") \
+    .trigger(processingTime="3 minutes") \
     .start()
 
 # Chờ quá trình streaming
