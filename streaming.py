@@ -4,8 +4,8 @@ from pyspark.sql.functions import from_json, col, to_date, unix_timestamp, date_
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType
 from helper import get_exchange_rate
 
-CHECK_POINT_DIR = 'hdfs://localhost:9000/user/spark/checkpoints'
-OUTPUT_PATH = "hdfs://localhost:9000/user/spark/transactions_csv"  # Đường dẫn lưu dữ liệu trên HDFS
+CHECK_POINT_DIR = 'hdfs://laptop-qhs1r0bj.mshome.net:9000/user/spark/checkpoints'
+OUTPUT_PATH = "hdfs://laptop-qhs1r0bj.mshome.net:9000/user/spark/transactions_csv"  # Đường dẫn lưu dữ liệu trên HDFS
 
 # Tạo SparkSession
 spark = SparkSession.builder \
@@ -77,6 +77,15 @@ formatted_transactions = valid_transactions \
     .withColumn("Date", date_format(
         to_date(concat(col("Day"), lit("/"), col("Month"), lit("/"), col("Year")), "dd/MM/yyyy"), "dd/MM/yyyy")) \
     .withColumn("Time", date_format(unix_timestamp(col("Time"), 'HH:mm').cast("timestamp"), 'HH:mm:ss'))
+
+# Kiểm tra giá trị NULL và thay thế
+formatted_transactions = formatted_transactions.fillna({
+    "Zip": 0,           
+    "Merchant State": "", 
+    "Errors?": "No",         
+})
+# Thay thế giá trị "\NaN\"" thành "No" trong cột "Errors?" 
+formatted_transactions = formatted_transactions.withColumn( "Errors?", regexp_replace(col("Errors?"), r"\\NaN\"\"", "No") )
 
 # Ghi từng batch ra HDFS dưới dạng CSV
 query = formatted_transactions \
