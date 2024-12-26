@@ -2,26 +2,28 @@ import io
 import pandas as pd
 from pywebhdfs.webhdfs import PyWebHdfsClient
 from airflow import DAG
+from airflow.models import Variable
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta, date
 import logging
 import numpy as np
 import pyodbc
 
+
 # SQL SERVER Configuration
-SQL_SERVER = "10.0.173.137"
-SQL_PORT = "1433"
-SQL_DATABASE = "CREDIT_CARD_TRANSACTIONS"
-SQL_USER = "sa"
-SQL_PASSWORD = "saadmin"
+SQL_SERVER = Variable.get("SQL_SERVER")
+SQL_PORT = Variable.get("SQL_PORT")
+SQL_DATABASE = Variable.get("SQL_DATABASE")
+SQL_USER = Variable.get("SQL_USER")
+SQL_PASSWORD = Variable.get("SQL_PASSWORD")
 
 # HDFS Configuration
 current_date = datetime.now().strftime("%d%m%Y")
 DAILY_FOLDER = f'transactions_{current_date}'
 
-HDFS_HOST = "LAPTOP-QHS1R0BJ.mshome.net"
-HDFS_PORT = "9870"
-HDFS_USER = "trieu"
+HDFS_HOST = Variable.get("HDFS_HOST")
+HDFS_PORT = Variable.get("HDFS_PORT")
+HDFS_USER = Variable.get("HDFS_USER")
 HDFS_PATH = f"/user/odap/{DAILY_FOLDER}/transactions_csv/"
 
 MERGED_CSV_PATH = f"/user/odap/all_transactions/trans_{current_date}.csv"
@@ -154,7 +156,6 @@ def sync_to_sqlserver(**kwargs):
             cursor.close()
         if conn:
             conn.close()
-
 
 sync_to_sqlserver_task = PythonOperator(
     task_id="sync_to_sqlserver",
