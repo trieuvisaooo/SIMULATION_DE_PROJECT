@@ -30,7 +30,6 @@ df = spark.readStream \
     .option("startingOffsets", "earliest") \
     .option("failOnDataLoss", "false") \
     .load()
-# Dùng để không bị terminated khi streaming dữ liệu
 
 # Chuyển value từ Kafka thành chuỗi
 messages = df.selectExpr("CAST(value AS STRING) as json_value") 
