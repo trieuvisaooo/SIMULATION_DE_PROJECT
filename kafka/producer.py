@@ -9,8 +9,6 @@ import os
 
 producer = Producer(PRODUCER_CONFIG)
 
-import os
-
 # File để lưu vị trí dòng cuối cùng đã đọc
 OFFSET_FILE = 'offset.txt'
 
