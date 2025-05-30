@@ -50,7 +50,7 @@ tin, tính toán dữ liệu.
     4. run producer.py
     5. run streaming.py
     6. Mở "http://localhost:9870/explorer.html#/user/spark/transactions_csv" để kiểm tra có file csv được lưu trữ hay chưa.
-5. Sử dụng Power B I để đọc dữ liệu từ Hadoop (dạng csv), thống kê dữ liệu theo mô tả bài 
+5. Sử dụng Power BI để đọc dữ liệu từ Hadoop (dạng csv), thống kê dữ liệu theo mô tả bài 
 toán và hiển thị dữ liệu một cách trực quan. 
-6. Sử dụng Air Flow để lên lịch quá trình đọc và hiển thị dữ liệu từ Power BI sao cho dữ liệu 
+7. Sử dụng Air Flow để lên lịch quá trình đọc và hiển thị dữ liệu từ Power BI sao cho dữ liệu 
 luôn được update mỗi ngày.
